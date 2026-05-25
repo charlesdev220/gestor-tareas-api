@@ -100,17 +100,64 @@ def test_listar_tareas_con_datos(client):
 
 
 # ---------------------------------------------------------------------------
-# TODO: casos de error — pendientes de implementar
+# Casos de error: 404 sobre id inexistente
 # ---------------------------------------------------------------------------
 
-# def test_crear_tarea_titulo_vacio(client):
-#     # Debería devolver 422 cuando el título está vacío o tiene menos de 3 caracteres
-#     pass
+def test_obtener_tarea_no_encontrada(client):
+    # GET /tasks/{id} con id inexistente debe devolver 404 con detail "Task not found"
+    response = client.get("/tasks/9999")
 
-# def test_obtener_tarea_no_encontrada(client):
-#     # Debería devolver 404 cuando el id no existe
-#     pass
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Task not found"}
 
-# def test_actualizar_tarea_completada(client):
-#     # Debería devolver 400 cuando se intenta modificar una tarea con estado "done"
-#     pass
+
+def test_actualizar_tarea_no_encontrada(client):
+    # PATCH /tasks/{id} con id inexistente debe devolver 404
+    response = client.patch("/tasks/9999", json={"title": "Nuevo título"})
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Task not found"}
+
+
+def test_eliminar_tarea_no_encontrada(client):
+    # DELETE /tasks/{id} con id inexistente debe devolver 404
+    response = client.delete("/tasks/9999")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Task not found"}
+
+
+# ---------------------------------------------------------------------------
+# Casos de error: validaciones aún no implementadas en la API
+# ---------------------------------------------------------------------------
+# Estos tests se marcan como xfail porque describen comportamiento esperado
+# que la aplicación todavía no implementa:
+#   - TaskCreate.title no valida longitud mínima (esquemas.py:13)
+#   - update_task no comprueba el estado actual antes de modificar
+#     (rutas/tareas.py:42-51)
+# Cuando se añada la validación correspondiente, eliminar el marker xfail.
+
+@pytest.mark.xfail(
+    reason="La API aún no valida longitud mínima del título en TaskCreate",
+    strict=True,
+)
+def test_crear_tarea_titulo_vacio(client):
+    # Debería devolver 422 cuando el título está vacío o tiene menos de 3 caracteres
+    response = client.post("/tasks/", json={"title": ""})
+
+    assert response.status_code == 422
+
+
+@pytest.mark.xfail(
+    reason="La API aún no impide modificar tareas con estado 'done'",
+    strict=True,
+)
+def test_actualizar_tarea_completada(client):
+    # Debería devolver 400 cuando se intenta modificar una tarea con estado "done"
+    creada = client.post(
+        "/tasks/", json={"title": "Tarea completada", "status": "done"}
+    ).json()
+
+    response = client.patch(f"/tasks/{creada['id']}", json={"title": "Otro título"})
+
+    assert response.status_code == 400
