@@ -8,15 +8,31 @@ from sqlalchemy import Column, DateTime, Enum, Integer, String
 from aplicacion.base_de_datos import Base
 
 
-# Enumeración con los estados posibles de una tarea
 class TaskStatus(str, enum.Enum):
+    """Enumeración con los estados posibles de una tarea.
+
+    Valores:
+        pending: tarea pendiente (estado inicial por defecto).
+        in_progress: tarea en curso.
+        done: tarea completada (estado terminal, bloquea modificaciones).
+    """
+
     pending = "pending"
     in_progress = "in_progress"
     done = "done"
 
 
-# Modelo que representa la tabla "tasks" en la base de datos
 class Task(Base):
+    """Modelo ORM que representa la tabla ``tasks`` en la base de datos.
+
+    Atributos:
+        id: clave primaria autoincremental.
+        title: título de la tarea (obligatorio, máx. 255 caracteres).
+        description: descripción opcional de la tarea.
+        status: estado actual (ver ``TaskStatus``).
+        created_at: fecha y hora de creación en UTC, asignada automáticamente.
+    """
+
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True, index=True)

@@ -19,8 +19,15 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-# Dependencia de FastAPI: abre la sesión, la cede y la cierra al terminar
 def get_db():
+    """Dependencia de FastAPI que provee una sesión de base de datos.
+
+    Abre una sesión, la cede al endpoint que la solicita y la cierra
+    automáticamente al terminar la petición.
+
+    Yields:
+        Session: sesión activa de SQLAlchemy.
+    """
     db = SessionLocal()
     try:
         yield db

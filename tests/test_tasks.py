@@ -18,6 +18,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 
 def override_get_db():
+    """Provee una sesión de BD en memoria para los tests."""
     db = TestingSessionLocal()
     try:
         yield db
@@ -30,14 +31,17 @@ client = TestClient(app)
 
 
 def setup_function():
+    """Crea todas las tablas antes de cada test."""
     Base.metadata.create_all(bind=engine)
 
 
 def teardown_function():
+    """Elimina todas las tablas después de cada test."""
     Base.metadata.drop_all(bind=engine)
 
 
 def _create_task(**kwargs):
+    """Crea una tarea de prueba vía POST y devuelve el JSON de respuesta."""
     body = {"title": "Tarea de prueba", **kwargs}
     resp = client.post("/tasks/", json=body)
     assert resp.status_code == 201
