@@ -88,3 +88,27 @@ def test_update_done_task_status_change_blocked():
     resp = client.patch(f"/tasks/{task['id']}", json={"status": "pending"})
     assert resp.status_code == 400
     assert resp.json()["detail"] == "Cannot update a completed task"
+
+
+def test_delete_all_tasks_clears_database():
+    """DELETE /tasks/ elimina todas las tareas y deja la lista vacía."""
+    _create_task(title="Tarea 1")
+    _create_task(title="Tarea 2")
+    _create_task(title="Tarea 3")
+
+    resp = client.delete("/tasks/")
+    assert resp.status_code == 204
+
+    resp = client.get("/tasks/")
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
+def test_delete_all_tasks_on_empty_database():
+    """DELETE /tasks/ sobre una base de datos vacía devuelve 204 sin error."""
+    resp = client.delete("/tasks/")
+    assert resp.status_code == 204
+
+    resp = client.get("/tasks/")
+    assert resp.status_code == 200
+    assert resp.json() == []
