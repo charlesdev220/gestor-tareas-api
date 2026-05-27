@@ -105,5 +105,24 @@ Los tests usan una base de datos SQLite en memoria con `StaticPool` para garanti
 - Un commit por cambio lógico; mensaje en formato `tipo: descripción breve` (feat, fix, refactor, docs, pruebas).
 - No hacer commit de `tareas.db`, `__pycache__/` ni archivos `.pyc`.
 
+## Documentación en PRs
+
+Cada Pull Request debe cumplir los siguientes requisitos de documentación:
+
+### Docstrings
+- Las funciones modificadas deben tener docstrings actualizados en castellano.
+- Formato: descripción breve, secciones `Args`, `Returns` y `Raises` cuando apliquen.
+- Las clases (modelos ORM, esquemas Pydantic, enums) también deben tener docstring descriptivo.
+
+### README
+- Si se añaden o modifican endpoints, actualizar la sección **Endpoints** del `README.md` con la ruta, método, parámetros y ejemplos de respuesta.
+
+### Descripción del PR
+- Usar la plantilla de `.github/PULL_REQUEST_TEMPLATE.md` que incluye:
+  - **Qué cambió**: resumen de los cambios realizados.
+  - **Por qué cambió**: motivación (bug, feature, refactor, etc.).
+  - **Cómo probarlo**: pasos para verificar los cambios.
+- Marcar el checklist de documentación antes de solicitar revisión.
+
 ## Nuevos endpoints
 - Todos los endpoints nuevos deben incluir al menos un test de caso error ademas del happy path obligatoriamente
