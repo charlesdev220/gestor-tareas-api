@@ -86,6 +86,7 @@ curl -X GET http://127.0.0.1:8000/tasks/
     "id": 1,
     "title": "Revisar documentación",
     "description": "Actualizar el README del proyecto",
+    "categoria": null,
     "status": "pending",
     "created_at": "2025-05-27T10:30:00"
   }
@@ -115,6 +116,7 @@ curl -X GET http://127.0.0.1:8000/tasks/1
   "id": 1,
   "title": "Revisar documentación",
   "description": "Actualizar el README del proyecto",
+  "categoria": null,
   "status": "pending",
   "created_at": "2025-05-27T10:30:00"
 }
@@ -144,6 +146,7 @@ curl -X GET http://127.0.0.1:8000/tasks/1
 |-------|------|-------------|-------------|
 | `title` | string | Sí | Título de la tarea |
 | `description` | string | No | Descripción de la tarea |
+| `categoria` | string | No | Categoría de la tarea |
 | `status` | string | No | Estado inicial (`pending`, `in_progress`, `done`). Por defecto: `pending` |
 
 **Ejemplo con curl:**
@@ -161,6 +164,7 @@ curl -X POST http://127.0.0.1:8000/tasks/ \
   "id": 2,
   "title": "Nueva tarea",
   "description": "Descripción de ejemplo",
+  "categoria": null,
   "status": "pending",
   "created_at": "2025-05-27T11:00:00"
 }
@@ -183,6 +187,7 @@ curl -X POST http://127.0.0.1:8000/tasks/ \
 |-------|------|-------------|
 | `title` | string | Nuevo título |
 | `description` | string | Nueva descripción |
+| `categoria` | string | Nueva categoría |
 | `status` | string | Nuevo estado (`pending`, `in_progress`, `done`) |
 
 > **Nota:** Las tareas con estado `done` no pueden ser actualizadas. El servidor devolverá `400 Bad Request`.
@@ -202,6 +207,7 @@ curl -X PATCH http://127.0.0.1:8000/tasks/1 \
   "id": 1,
   "title": "Revisar documentación",
   "description": "Actualizar el README del proyecto",
+  "categoria": null,
   "status": "in_progress",
   "created_at": "2025-05-27T10:30:00"
 }
@@ -287,7 +293,7 @@ gestor-tareas-api/
 |-------------------|-------------|
 | `aplicacion/principal.py` | Crea la instancia de FastAPI, genera las tablas e incluye el router de tareas |
 | `aplicacion/base_de_datos.py` | Define el engine SQLite, la fábrica de sesiones (`SessionLocal`) y la dependencia `get_db` |
-| `aplicacion/modelos.py` | Modelo ORM `Task` con campos `id`, `title`, `description`, `status` y `created_at`; enum `TaskStatus` |
+| `aplicacion/modelos.py` | Modelo ORM `Task` con campos `id`, `title`, `description`, `categoria`, `status` y `created_at`; enum `TaskStatus` |
 | `aplicacion/esquemas.py` | Esquemas Pydantic: `TaskCreate` (POST), `TaskUpdate` (PATCH) y `TaskResponse` (salida) |
 | `aplicacion/rutas/tareas.py` | Endpoints REST: listar, obtener, crear, actualizar y eliminar tareas |
 | `tests/test_tasks.py` | Tests e2e usando `TestClient` de FastAPI con base de datos en memoria |

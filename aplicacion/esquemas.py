@@ -16,6 +16,7 @@ class TaskCreate(BaseModel):
 
     title: str
     description: Optional[str] = None
+    categoria: Optional[str] = None
     status: TaskStatus = TaskStatus.pending
 
 
@@ -30,6 +31,7 @@ class TaskUpdate(BaseModel):
 
     title: Optional[str] = None
     description: Optional[str] = None
+    categoria: Optional[str] = None
     status: Optional[TaskStatus] = None
 
     @field_validator("title")
@@ -51,6 +53,7 @@ class TaskResponse(BaseModel):
     id: int
     title: str
     description: Optional[str]
+    categoria: Optional[str]
     status: TaskStatus
     created_at: datetime
 

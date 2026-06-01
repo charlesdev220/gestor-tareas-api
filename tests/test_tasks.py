@@ -41,7 +41,12 @@ def teardown_function():
 
 
 def _create_task(**kwargs):
-    """Crea una tarea de prueba vía POST y devuelve el JSON de respuesta."""
+    """Crea una tarea de prueba vía POST y devuelve el JSON de respuesta.
+
+    Args:
+        **kwargs: campos opcionales (``description``, ``categoria``, ``status``, etc.)
+            que se fusionan con los valores por defecto.
+    """
     body = {"title": "Tarea de prueba", **kwargs}
     resp = client.post("/tasks/", json=body)
     assert resp.status_code == 201
@@ -96,3 +101,44 @@ def test_update_task_title_too_short_returns_422():
     resp = client.patch(f"/tasks/{task['id']}", json={"title": "AB"})
     assert resp.status_code == 422
     assert "El título debe tener al menos 3 caracteres" in resp.text
+
+
+# ---------- Tests del campo categoria ----------
+
+
+def test_create_task_with_categoria():
+    """Crear una tarea con categoría debe guardarla y devolverla en la respuesta."""
+    task = _create_task(categoria="trabajo")
+    assert task["categoria"] == "trabajo"
+
+
+def test_create_task_without_categoria_returns_null():
+    """Crear una tarea sin categoría debe devolver categoria como null."""
+    task = _create_task()
+    assert task["categoria"] is None
+
+
+def test_get_task_returns_categoria():
+    """Obtener una tarea por id debe incluir el campo categoria."""
+    task = _create_task(categoria="personal")
+    resp = client.get(f"/tasks/{task['id']}")
+    assert resp.status_code == 200
+    assert resp.json()["categoria"] == "personal"
+
+
+def test_update_task_categoria_via_patch():
+    """Actualizar la categoría de una tarea vía PATCH debe reflejarse en la respuesta."""
+    task = _create_task()
+    resp = client.patch(f"/tasks/{task['id']}", json={"categoria": "urgente"})
+    assert resp.status_code == 200
+    assert resp.json()["categoria"] == "urgente"
+
+
+def test_list_tasks_includes_categoria():
+    """Listar tareas debe incluir el campo categoria en cada elemento."""
+    _create_task(categoria="hogar")
+    resp = client.get("/tasks/")
+    assert resp.status_code == 200
+    tasks = resp.json()
+    assert len(tasks) >= 1
+    assert tasks[0]["categoria"] == "hogar"
