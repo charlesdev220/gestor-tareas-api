@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from aplicacion.modelos import TaskStatus
 
@@ -23,11 +23,22 @@ class TaskUpdate(BaseModel):
     """Esquema de entrada para actualizar parcialmente una tarea (PATCH).
 
     Todos los campos son opcionales; solo se modifican los enviados.
+
+    Raises:
+        ValueError: si ``title`` tiene menos de 3 caracteres.
     """
 
     title: Optional[str] = None
     description: Optional[str] = None
     status: Optional[TaskStatus] = None
+
+    @field_validator("title")
+    @classmethod
+    def title_min_length(cls, v: str | None) -> str | None:
+        """Valida que el título tenga al menos 3 caracteres."""
+        if v is not None and len(v) < 3:
+            raise ValueError("El título debe tener al menos 3 caracteres")
+        return v
 
 
 class TaskResponse(BaseModel):
