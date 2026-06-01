@@ -76,6 +76,7 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
     Raises:
         HTTPException 404: si la tarea no existe.
         HTTPException 400: si la tarea ya está completada.
+        HTTPException 422: si el título tiene menos de 3 caracteres.
     """
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
