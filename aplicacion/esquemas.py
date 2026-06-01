@@ -5,18 +5,20 @@ from typing import Optional
 
 from pydantic import BaseModel, field_validator
 
-from aplicacion.modelos import TaskStatus
+from aplicacion.modelos import TaskPriority, TaskStatus
 
 
 class TaskCreate(BaseModel):
     """Esquema de entrada para crear una nueva tarea.
 
-    Solo el título es obligatorio; el estado por defecto es ``pending``.
+    Solo el título es obligatorio; el estado por defecto es ``pending``
+    y la prioridad por defecto es ``medium``.
     """
 
     title: str
     description: Optional[str] = None
     status: TaskStatus = TaskStatus.pending
+    priority: TaskPriority = TaskPriority.medium
 
 
 class TaskUpdate(BaseModel):
@@ -31,6 +33,7 @@ class TaskUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     status: Optional[TaskStatus] = None
+    priority: Optional[TaskPriority] = None
 
     @field_validator("title")
     @classmethod
@@ -52,6 +55,7 @@ class TaskResponse(BaseModel):
     title: str
     description: Optional[str]
     status: TaskStatus
+    priority: TaskPriority
     created_at: datetime
 
     model_config = {"from_attributes": True}

@@ -96,3 +96,58 @@ def test_update_task_title_too_short_returns_422():
     resp = client.patch(f"/tasks/{task['id']}", json={"title": "AB"})
     assert resp.status_code == 422
     assert "El título debe tener al menos 3 caracteres" in resp.text
+
+
+# --- Tests del campo prioridad ---
+
+
+def test_create_task_default_priority_is_medium():
+    """Crear una tarea sin especificar prioridad asigna 'medium' por defecto."""
+    task = _create_task()
+    assert task["priority"] == "medium"
+
+
+def test_create_task_with_explicit_priority():
+    """Crear una tarea con prioridad explícita la almacena correctamente."""
+    task = _create_task(priority="high")
+    assert task["priority"] == "high"
+
+
+def test_create_task_with_invalid_priority_returns_422():
+    """Crear una tarea con prioridad inválida devuelve 422."""
+    resp = client.post("/tasks/", json={"title": "Tarea", "priority": "urgent"})
+    assert resp.status_code == 422
+
+
+def test_update_task_priority():
+    """Actualizar la prioridad de una tarea existente funciona correctamente."""
+    task = _create_task()
+    resp = client.patch(f"/tasks/{task['id']}", json={"priority": "high"})
+    assert resp.status_code == 200
+    assert resp.json()["priority"] == "high"
+
+
+def test_update_task_invalid_priority_returns_422():
+    """Actualizar una tarea con prioridad inválida devuelve 422."""
+    task = _create_task()
+    resp = client.patch(f"/tasks/{task['id']}", json={"priority": "critical"})
+    assert resp.status_code == 422
+
+
+def test_list_tasks_filter_by_priority():
+    """Filtrar tareas por prioridad devuelve solo las que coinciden."""
+    _create_task(priority="low")
+    _create_task(priority="high")
+    _create_task(priority="high")
+
+    resp = client.get("/tasks/", params={"priority": "high"})
+    assert resp.status_code == 200
+    tasks = resp.json()
+    assert len(tasks) == 2
+    assert all(t["priority"] == "high" for t in tasks)
+
+
+def test_list_tasks_filter_invalid_priority_returns_422():
+    """Filtrar tareas con prioridad inválida devuelve 422."""
+    resp = client.get("/tasks/", params={"priority": "urgent"})
+    assert resp.status_code == 422

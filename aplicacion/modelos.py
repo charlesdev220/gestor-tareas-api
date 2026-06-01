@@ -22,6 +22,20 @@ class TaskStatus(str, enum.Enum):
     done = "done"
 
 
+class TaskPriority(str, enum.Enum):
+    """Enumeración con los niveles de prioridad de una tarea.
+
+    Valores:
+        low: prioridad baja.
+        medium: prioridad media (valor por defecto).
+        high: prioridad alta.
+    """
+
+    low = "low"
+    medium = "medium"
+    high = "high"
+
+
 class Task(Base):
     """Modelo ORM que representa la tabla ``tasks`` en la base de datos.
 
@@ -30,6 +44,7 @@ class Task(Base):
         title: título de la tarea (obligatorio, máx. 255 caracteres).
         description: descripción opcional de la tarea.
         status: estado actual (ver ``TaskStatus``).
+        priority: nivel de prioridad (ver ``TaskPriority``), por defecto ``medium``.
         created_at: fecha y hora de creación en UTC, asignada automáticamente.
     """
 
@@ -39,5 +54,6 @@ class Task(Base):
     title = Column(String(255), nullable=False)
     description = Column(String, nullable=True)
     status = Column(Enum(TaskStatus), default=TaskStatus.pending, nullable=False)
+    priority = Column(Enum(TaskPriority), default=TaskPriority.medium, nullable=False)
     # La fecha de creación se asigna automáticamente al insertar el registro
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)

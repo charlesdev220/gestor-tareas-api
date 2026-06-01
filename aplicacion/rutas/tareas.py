@@ -7,20 +7,29 @@ from sqlalchemy.orm import Session
 
 from aplicacion.base_de_datos import get_db
 from aplicacion.esquemas import TaskCreate, TaskResponse, TaskUpdate
-from aplicacion.modelos import Task, TaskStatus
+from aplicacion.modelos import Task, TaskPriority, TaskStatus
 
 # Router con prefijo /tasks; agrupa todos los endpoints de tareas
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @router.get("/", response_model=List[TaskResponse])
-def list_tasks(db: Session = Depends(get_db)):
-    """Devuelve la lista completa de tareas almacenadas.
+def list_tasks(
+    priority: TaskPriority | None = None,
+    db: Session = Depends(get_db),
+):
+    """Devuelve la lista de tareas almacenadas, con filtro opcional por prioridad.
+
+    Args:
+        priority: filtra por nivel de prioridad (``low``, ``medium``, ``high``).
 
     Returns:
-        Lista de ``TaskResponse`` con todas las tareas.
+        Lista de ``TaskResponse`` con las tareas que cumplen el filtro.
     """
-    return db.query(Task).all()
+    query = db.query(Task)
+    if priority is not None:
+        query = query.filter(Task.priority == priority)
+    return query.all()
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
@@ -47,7 +56,7 @@ def create_task(payload: TaskCreate, db: Session = Depends(get_db)):
     """Crea una nueva tarea y devuelve el recurso creado.
 
     Args:
-        payload: datos de la tarea según ``TaskCreate``.
+        payload: datos de la tarea según ``TaskCreate`` (incluye ``priority``).
 
     Returns:
         ``TaskResponse`` con la tarea creada (código 201).
