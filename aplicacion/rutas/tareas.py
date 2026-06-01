@@ -51,6 +51,9 @@ def create_task(payload: TaskCreate, db: Session = Depends(get_db)):
 
     Returns:
         ``TaskResponse`` con la tarea creada (código 201).
+
+    Raises:
+        HTTPException 422: si el título tiene menos de 3 caracteres.
     """
     task = Task(**payload.model_dump())
     db.add(task)
