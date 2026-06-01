@@ -96,3 +96,24 @@ def test_update_task_title_too_short_returns_422():
     resp = client.patch(f"/tasks/{task['id']}", json={"title": "AB"})
     assert resp.status_code == 422
     assert "El título debe tener al menos 3 caracteres" in resp.text
+
+
+def test_create_task_title_too_short_returns_422():
+    """Crear una tarea con un título de menos de 3 caracteres debe devolver 422."""
+    resp = client.post("/tasks/", json={"title": "AB"})
+    assert resp.status_code == 422
+    assert "El título debe tener al menos 3 caracteres" in resp.text
+
+
+def test_create_task_empty_title_returns_422():
+    """Crear una tarea con un título vacío debe devolver 422."""
+    resp = client.post("/tasks/", json={"title": ""})
+    assert resp.status_code == 422
+    assert "El título debe tener al menos 3 caracteres" in resp.text
+
+
+def test_create_task_title_exactly_3_chars_succeeds():
+    """Crear una tarea con un título de exactamente 3 caracteres debe funcionar."""
+    resp = client.post("/tasks/", json={"title": "ABC"})
+    assert resp.status_code == 201
+    assert resp.json()["title"] == "ABC"

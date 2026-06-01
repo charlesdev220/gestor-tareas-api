@@ -12,11 +12,22 @@ class TaskCreate(BaseModel):
     """Esquema de entrada para crear una nueva tarea.
 
     Solo el título es obligatorio; el estado por defecto es ``pending``.
+
+    Raises:
+        ValueError: si ``title`` tiene menos de 3 caracteres.
     """
 
     title: str
     description: Optional[str] = None
     status: TaskStatus = TaskStatus.pending
+
+    @field_validator("title")
+    @classmethod
+    def title_min_length(cls, v: str) -> str:
+        """Valida que el título tenga al menos 3 caracteres."""
+        if len(v) < 3:
+            raise ValueError("El título debe tener al menos 3 caracteres")
+        return v
 
 
 class TaskUpdate(BaseModel):
